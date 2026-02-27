@@ -100,12 +100,12 @@ async def get_ip_text(request: Request):
     """返回客户端IP地址（纯文本格式）"""
     return get_client_ip(request)
 
-@app.get("/ip-json")
+@app.get("/ip-json", response_class=JSONResponse)
 async def get_ip_json(request: Request):
     """返回客户端IP地址（JSON格式）"""
     return {"ip": get_client_ip(request)}
 
-@app.get("/ip-details")
+@app.get("/ip-details", response_class=JSONResponse)
 async def get_ip_details(request: Request):
     """返回详细的IP信息"""
     client_ip = get_client_ip(request)
@@ -133,7 +133,7 @@ async def get_ip_details(request: Request):
         }
     }
 
-@app.get("/ip-info")
+@app.get("/ip-info", response_class=JSONResponse)
 async def get_ip_info(request: Request):
     """返回客户端IP和基本请求信息"""
     client_ip = get_client_ip(request)
@@ -146,7 +146,7 @@ async def get_ip_info(request: Request):
         "path": request.url.path
     }
 
-@app.get("/health")
+@app.get("/health", response_class=JSONResponse)
 async def health_check():
     """健康检查端点"""
     return {
