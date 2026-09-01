@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>机理模型清单 - 中国石化 模型工厂</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Microsoft YaHei', 'Source Han Sans CN', sans-serif; background: #F5F7FA; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+
+.top-bar {
+  height: 56px; background: #fff; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; border-bottom: 1px solid #e8e8e8; flex-shrink: 0;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+}
+.top-bar-left { display: flex; align-items: center; gap: 10px; }
+.top-bar-text { font-size: 14px; color: #333; font-weight: 500; }
+.top-bar-text .separator { color: #ccc; margin: 0 6px; }
+.top-bar-right { display: flex; align-items: center; gap: 16px; }
+.top-bar-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: #666; position: relative; padding: 4px; }
+.top-bar-btn .dot { position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #C8102E; border-radius: 50%; }
+.top-bar-user { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.top-bar-avatar { width: 32px; height: 32px; border-radius: 50%; background: #E60012; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+
+.body-wrap { display: flex; flex: 1; margin-top: 56px; }
+
+.sidebar {
+  width: 240px; background: #fff;
+  color: #333; display: flex; flex-direction: column; flex-shrink: 0;
+  border-right: 1px solid #e8e8e8;
+}
+.sidebar-nav { flex: 1; overflow-y: auto; padding: 8px 0; }
+.nav-group { margin-bottom: 4px; }
+.nav-group-title { padding: 12px 20px 6px; font-size: 11px; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
+.nav-item {
+  display: flex; align-items: center; padding: 0 16px; cursor: pointer;
+  color: #555; font-size: 14px; transition: all 0.2s;
+  border-left: 3px solid transparent; text-decoration: none;
+  border-radius: 0 6px 6px 0; margin-right: 8px; height: 60px;
+}
+.nav-item:hover { background: #FFF5F5; color: #E60012; }
+.nav-item:hover .nav-icon svg { stroke: #E60012; }
+.nav-item.active { background: #FFE8E6; color: #E60012; border-left-color: #E60012; font-weight: 500; }
+.nav-item.active .nav-icon svg { stroke: #E60012; }
+.nav-icon { width: 20px; height: 20px; margin-right: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.nav-icon svg { width: 16px; height: 16px; stroke: #888; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.2s; }
+
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.content { flex: 1; overflow-y: auto; padding: 20px 24px; }
+
+.card {
+  background: #fff; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  padding: 20px; margin-bottom: 16px;
+}
+.card-title { font-size: 16px; font-weight: 600; color: #003366; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.card-title::before { content: ''; width: 3px; height: 16px; background: #C8102E; border-radius: 2px; }
+
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+.stat-card {
+  background: #fff; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  padding: 16px; text-align: center;
+}
+.stat-value { font-size: 28px; font-weight: bold; color: #003366; }
+.stat-label { font-size: 12px; color: #999; margin-top: 4px; }
+.stat-sub { font-size: 11px; color: #52c41a; margin-top: 2px; }
+.stat-sub.down { color: #C8102E; }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { background: #fafafa; padding: 10px 12px; text-align: left; font-weight: 500; color: #666; border-bottom: 1px solid #e8e8e8; height: 48px; }
+td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; height: 48px; }
+tr:hover td { background: #fafafa; }
+
+.tag { display: inline-flex; align-items: center; justify-content: center; padding: 0 8px; border-radius: 3px; font-size: 11px; height: 22px; }
+.tag-blue { background: #E6F5FC; color: #00A0E9; }
+.tag-green { background: #E6F9ED; color: #00A73C; }
+.tag-red { background: #FDE8E8; color: #E60012; }
+.tag-gold { background: #FFF2E6; color: #F08300; }
+.tag-gray { background: #f5f5f5; color: #666; }
+.tag-purple { background: #f9f0ff; color: #722ed1; }
+
+.btn {
+  background: #E60012; color: #fff; border: none; padding: 8px 20px;
+  border-radius: 4px; cursor: pointer; font-size: 14px; font-family: inherit;
+}
+.btn:hover { background: #ff1a2e; }
+.btn-secondary { background: #fff; color: #333; border: 1px solid #d9d9d9; }
+.btn-secondary:hover { background: #E60012; border-color: #E60012; color: #fff; }
+.btn-icon { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; margin-right: 6px; vertical-align: -2px; flex-shrink: 0; }
+.btn-icon svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+.form-input { padding: 6px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px; font-family: inherit; outline: none; width: 200px; }
+.form-input:focus { border-color: #E60012; box-shadow: 0 0 0 2px rgba(230,0,18,0.1); }
+.form-select { padding: 6px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px; font-family: inherit; outline: none; }
+.form-select:focus { border-color: #E60012; box-shadow: 0 0 0 2px rgba(230,0,18,0.1); }
+
+.page-header { margin-bottom: 20px; }
+.page-header h2 { font-size: 20px; color: #003366; }
+.page-header p { font-size: 13px; color: #999; margin-top: 4px; }
+
+.op-link { color: #1890FF; text-decoration: none; font-size: 12px; cursor: pointer; margin-right: 12px; }
+.op-link:hover { color: #E60012; text-decoration: underline; }
+.op-link.red { color: #C8102E; }
+
+/* 右侧抽屉样式 */
+.drawer-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5); z-index: 1000; visibility: hidden;
+  opacity: 0; transition: all 0.3s ease; backdrop-filter: blur(2px);
+}
+.drawer-overlay.open { visibility: visible; opacity: 1; }
+.drawer-container {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 860px;
+  background: #F5F7FA; box-shadow: -2px 0 12px rgba(0,0,0,0.15);
+  z-index: 1001; transform: translateX(100%); transition: transform 0.3s ease;
+  display: flex; flex-direction: column;
+}
+.drawer-overlay.open .drawer-container { transform: translateX(0); }
+.drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px; background: #fff; border-bottom: 1px solid #e8e8e8;
+}
+.drawer-header h3 { font-size: 18px; color: #003366; font-weight: 600; margin: 0; }
+.drawer-header-actions { display: flex; align-items: center; gap: 12px; }
+.drawer-edit-btn {
+  background: #fff; color: #003366; border: 1px solid #d0d7de; padding: 6px 16px;
+  border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500;
+  display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+}
+.drawer-edit-btn:hover { background: #f0f4ff; border-color: #003366; transform: translateY(-1px); }
+.drawer-edit-btn svg { width: 14px; height: 14px; stroke: #003366; stroke-width: 1.8; fill: none; }
+.drawer-publish-btn {
+  background: #E60012; color: #fff; border: none; padding: 6px 16px;
+  border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500;
+  display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+}
+.drawer-publish-btn:hover { background: #ff1a2e; transform: translateY(-1px); }
+.drawer-publish-btn svg { width: 14px; height: 14px; stroke: white; stroke-width: 1.8; fill: none; }
+.drawer-close {
+  background: none; border: none; font-size: 24px; cursor: pointer; color: #999;
+  line-height: 1; padding: 0 4px;
+}
+.drawer-close:hover { color: #E60012; }
+.drawer-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
+
+/* 发布详情内样式 */
+.tab-nav {
+  display: flex; gap: 0; border-bottom: 2px solid #e8e8e8; margin-bottom: 16px;
+}
+.tab-btn {
+  padding: 8px 20px; cursor: pointer; font-size: 14px; color: #666;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  transition: all 0.2s; background: none; border: none; font-family: inherit;
+}
+.tab-btn:hover { color: #E60012; }
+.tab-btn.active { color: #E60012; border-bottom-color: #E60012; font-weight: 500; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.model-summary {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px 20px;
+  background: #fff; border-radius: 4px; padding: 14px 18px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 16px;
+}
+.ms-info { flex: 1; }
+.ms-name { font-size: 16px; font-weight: 600; color: #333; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.ms-desc { font-size: 12px; color: #999; margin-top: 4px; }
+.ms-metrics { display: flex; gap: 16px; flex-shrink: 0; }
+.ms-metric { text-align: center; }
+.msv { font-size: 16px; font-weight: 700; }
+.msl { font-size: 10px; color: #999; }
+
+.resource-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.resource-item { background: #fafafa; border-radius: 4px; padding: 12px; text-align: center; border: 1px solid #f0f0f0; }
+.rv { font-size: 18px; font-weight: bold; }
+.rl { font-size: 11px; color: #999; }
+
+.info-row { display: flex; padding: 6px 0; font-size: 13px; }
+.info-label { width: 110px; color: #999; flex-shrink: 0; }
+.info-value { color: #333; font-weight: 500; }
+
+.dep-list { background: #fafafa; border-radius: 4px; padding: 12px 16px; margin-top: 8px; }
+.dep-item { display: flex; padding: 8px 0; border-bottom: 1px solid #e8e8e8; font-size: 13px; }
+.dep-item:last-child { border-bottom: none; }
+.dep-name { width: 140px; font-weight: 600; color: #003366; font-family: monospace; }
+.dep-version { width: 100px; color: #00A0E9; }
+.dep-desc { color: #666; }
+
+/* 实验记录表格操作按钮样式 */
+.action-buttons {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.action-btn-sm {
+  background: none; border: 1px solid #d9d9d9; border-radius: 4px;
+  padding: 4px 8px; font-size: 11px; cursor: pointer;
+  transition: all 0.2s; font-family: inherit;
+}
+.action-btn-sm:hover { border-color: #E60012; color: #E60012; background: #FFF5F5; }
+
+@media (max-width: 1400px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .drawer-container { width: 90%; }
+}
+
+
+/* ===== 与 AI 机理求解页统一的视觉优化 ===== */
+html, body { height:100%; overflow:hidden; font-family:'Microsoft YaHei', 'Segoe UI', sans-serif; background:#F5F7FA; color:#1F2A3A; }
+.top-bar { position:static; height:56px; padding:0 20px; box-shadow:none; }
+.body-wrap { height:calc(100vh - 56px); margin-top:0; overflow:hidden; }
+.brand { display:flex; align-items:center; gap:10px; font-size:14px; font-weight:600; color:#003366; }
+.logo-dot { width:28px; height:28px; border-radius:50%; background:#E60012; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-weight:700; }
+.sidebar { width:220px; }
+.nav-item { height:48px; border-radius:0; margin-right:0; padding:0 18px; }
+.nav-group-title { padding:10px 20px; color:#bbb; font-size:11px; letter-spacing:0; text-transform:none; }
+.main { min-width:0; background:#F5F7FA; }
+.content { padding:20px; }
+.page-header { background:#fff; border:1px solid #e8e8e8; border-radius:14px; padding:18px 20px; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+.page-header h2 { font-size:18px; color:#003366; }
+.page-header p { color:#8a94a6; }
+.card, .stat-card { border:1px solid #e5e7eb; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+.card { padding:18px; }
+.card-title { font-size:15px; font-weight:700; }
+.card-title::before { background:#E60012; height:18px; border-radius:3px; }
+.stats-row { gap:12px; }
+.stat-card { text-align:left; padding:16px 18px; position:relative; overflow:hidden; }
+.stat-card::after { content:''; position:absolute; right:-18px; top:-18px; width:68px; height:68px; border-radius:50%; background:rgba(230,0,18,.06); }
+.stat-value { font-size:30px; line-height:1; }
+.stat-label { color:#667085; margin-top:8px; }
+.btn { border-radius:18px; padding:8px 16px; font-weight:600; transition:all .2s; }
+.btn:hover { transform:translateY(-1px); box-shadow:0 4px 10px rgba(230,0,18,.18); }
+.btn-secondary { border-color:#d9d9d9; box-shadow:none; }
+.form-input, .form-select { border-radius:18px; padding:7px 12px; background:#fff; }
+th { background:#f8fafc; color:#475467; font-weight:700; }
+td, th { height:50px; }
+tr:hover td { background:#fff8f8; }
+.tag { border-radius:12px; height:22px; padding:0 9px; font-weight:600; }
+.op-link { color:#003366; font-weight:600; padding:4px 10px; border-radius:6px; border:1px solid #d0d7de; background:#fff; transition: all .2s; white-space:nowrap; }
+.op-link:hover { color:#E60012; background:#FFF5F5; border-color:#E60012; text-decoration:none; }
+.op-link.disabled { color:#ccc; cursor:not-allowed; pointer-events:none; background:#f9f9f9; border-color:#eee; }
+/* 编辑按钮 — 蓝色系 */
+.op-link.op-edit { color:#027a48; border-color:#b7ebc6; background:#f6ffed; }
+.op-link.op-edit:hover { color:#00A73C; background:#e6f9ed; border-color:#00A73C; }
+/* 发布按钮 — 红色系（主色） */
+.op-link.op-publish { color:#E60012; border-color:#ffccc7; background:#fff1f0; }
+.op-link.op-publish:hover { background:#E60012; color:#fff; border-color:#E60012; }
+/* 停用按钮 — 灰色系 */
+.op-link.op-disable { color:#6b7280; border-color:#d5dbe3; background:#f6f8fa; }
+.op-link.op-disable:hover { background:#4b5563; color:#fff; border-color:#4b5563; }
+/* 测试按钮 — 金色系 */
+.op-link.op-test { color:#F08300; border-color:#ffe0a3; background:#fff7e6; }
+.op-link.op-test:hover { color:#E60012; background:#FFF5F5; border-color:#E60012; }
+.op-link.op-test.disabled { color:#bbb; border-color:#eee; background:#f9f9f9; }
+
+/* ===== 换页栏 ===== */
+.pagination { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-top:1px solid #eef2f7; flex-wrap:wrap; gap:10px; }
+.pg-info { font-size:13px; color:#667085; }
+.pg-info b { color:#E60012; font-weight:600; margin:0 2px; }
+.pg-controls { display:flex; align-items:center; gap:6px; }
+.pg-btn { min-width:30px; height:30px; padding:0 8px; border:1px solid #d5dbe3; background:#fff; color:#475467; border-radius:6px; cursor:pointer; font-size:13px; font-family:inherit; transition: all .2s; display:inline-flex; align-items:center; justify-content:center; }
+.pg-btn:hover:not(:disabled):not(.active) { color:#E60012; border-color:#E60012; background:#FFF5F5; }
+.pg-btn.active { background:#E60012; color:#fff; border-color:#E60012; font-weight:600; cursor:default; }
+.pg-btn:disabled { color:#ccc; border-color:#eee; background:#f9f9f9; cursor:not-allowed; }
+.pg-ellipsis { color:#999; padding:0 2px; font-size:13px; }
+.pg-size { height:30px; padding:0 8px; border:1px solid #d5dbe3; border-radius:6px; background:#fff; color:#475467; font-size:13px; font-family:inherit; cursor:pointer; margin-left:8px; outline:none; }
+.pg-size:focus { border-color:#E60012; }
+
+/* ===== 外部调用 tab（MCP 调用样例） ===== */
+.mcp-intro { font-size:13px; color:#667085; line-height:1.8; margin-bottom:12px; }
+.mcp-code { font-family:Consolas, 'SF Mono', 'Microsoft YaHei', monospace; font-size:12.5px; word-break:break-all; color:#003366; }
+.code-block-wrap { border:1px solid #e5e7eb; border-radius:10px; overflow:hidden; background:#1e293b; }
+.code-block-header { display:flex; align-items:center; justify-content:space-between; padding:8px 14px; background:#0f172a; border-bottom:1px solid #334155; }
+.code-lang-badge { font-size:11px; font-weight:700; color:#fca5a5; letter-spacing:.5px; text-transform:uppercase; }
+.code-copy-btn { background:transparent; border:1px solid #475569; color:#cbd5e1; font-size:11px; padding:3px 10px; border-radius:4px; cursor:pointer; font-family:inherit; transition:all .2s; }
+.code-copy-btn:hover { border-color:#E60012; color:#fff; background:#E60012; }
+.code-block { margin:0; padding:14px; max-height:360px; overflow:auto; font-family:Consolas, 'SF Mono', 'Microsoft YaHei', monospace; font-size:12px; line-height:1.65; color:#e2e8f0; white-space:pre; tab-size:2; }
+.code-block::-webkit-scrollbar { width:8px; height:8px; }
+.code-block::-webkit-scrollbar-thumb { background:#475569; border-radius:4px; }
+.mcp-steps { display:flex; flex-direction:column; gap:10px; }
+.mcp-step { display:flex; gap:12px; align-items:flex-start; padding:10px 14px; background:#fafbfc; border:1px solid #eef2f7; border-radius:8px; }
+.mcp-step-num { width:22px; height:22px; border-radius:50%; background:#E60012; color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+.mcp-step-body { font-size:13px; color:#475467; line-height:1.7; }
+.mcp-step-body b { color:#003366; }
+
+/* 服务连通性测试弹窗 */
+.test-modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 2000; display:none; align-items:center; justify-content:center; backdrop-filter: blur(2px); }
+.test-modal-overlay.open { display:flex; }
+.test-modal { width: 520px; max-width: calc(100vw - 48px); background:#fff; border-radius:8px; box-shadow: 0 12px 40px rgba(0,0,0,0.2); overflow:hidden; }
+.test-modal-header { display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid #e8e8e8; }
+.test-modal-header .tm-title { font-size:16px; font-weight:600; color:#003366; display:flex; align-items:center; gap:8px; }
+.test-modal-header .tm-title::before { content:''; width:3px; height:16px; background:#C8102E; border-radius:2px; }
+.test-modal-model { flex:1; font-size:12px; color:#999; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.test-modal-close { background:none; border:none; font-size:22px; color:#999; cursor:pointer; line-height:1; padding:0 2px; flex-shrink:0; }
+.test-modal-close:hover { color:#E60012; }
+.test-modal-body { padding:20px; }
+.test-step { display:flex; align-items:center; gap:14px; padding:14px 16px; border:1px solid #eef2f7; border-radius:8px; background:#fbfcfe; margin-bottom:12px; transition: all .3s; }
+.test-step .step-index { width:28px; height:28px; border-radius:50%; background:#f0f0f0; color:#999; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex-shrink:0; }
+.test-step .step-main { flex:1; min-width:0; }
+.test-step .step-title { font-size:14px; font-weight:600; color:#333; }
+.test-step .step-desc { font-size:12px; color:#999; margin-top:2px; }
+.test-step .step-status { font-size:12px; margin-top:6px; display:flex; align-items:center; gap:6px; color:#666; }
+.status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.status-dot.pending { background:#ccc; }
+.status-dot.testing { background:#F08300; animation: tm-pulse 1s ease-in-out infinite; }
+.status-dot.success { background:#00A73C; }
+.status-dot.failed { background:#E60012; }
+@keyframes tm-pulse { 50% { opacity:.35; } }
+.test-step .step-btn { background:#E60012; color:#fff; border:none; padding:6px 14px; border-radius:4px; cursor:pointer; font-size:12px; font-family:inherit; white-space:nowrap; flex-shrink:0; transition: background .2s; }
+.test-step .step-btn:hover:not(:disabled) { background:#ff1a2e; }
+.test-step .step-btn:disabled { background:#f5f5f5; color:#bbb; cursor:not-allowed; }
+.test-step.locked { opacity:.6; }
+.test-step.doing { border-color:#E60012; background:#FFF9F9; }
+.test-step.done { border-color:#b7ebc6; background:#f6ffed; }
+.test-step.done .step-index { background:#E6F9ED; color:#00A73C; }
+.test-step.failed { border-color:#fda4af; background:#FFF5F5; }
+.test-step.failed .step-index { background:#FDE8E8; color:#E60012; }
+.test-result-bar { display:none; align-items:center; gap:8px; border-radius:6px; padding:10px 14px; font-size:13px; font-weight:500; }
+.test-result-bar.show { display:flex; }
+.test-result-bar.success { background:#E6F9ED; color:#00A73C; border:1px solid #b7ebc6; }
+.test-result-bar.error { background:#FDE8E8; color:#E60012; border:1px solid #fda4af; }
+.test-modal-footer { display:flex; justify-content:flex-end; gap:10px; padding:14px 20px; border-top:1px solid #e8e8e8; background:#fafafa; }
+
+/* 故障模拟开关 */
+.tm-fault-toggle { display:flex; align-items:center; gap:5px; font-size:11px; color:#999; cursor:pointer; user-select:none; }
+.tm-fault-toggle input { margin:0; cursor:pointer; accent-color:#E60012; }
+.tm-fault-toggle:hover { color:#E60012; }
+
+/* 测试耗时日志 */
+.test-log { margin-top:4px; border:1px solid #eef2f7; border-radius:8px; background:#fbfcfe; overflow:hidden; }
+.test-log-header { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:#f8fafc; border-bottom:1px solid #eef2f7; }
+.test-log-header .tl-title { font-size:12px; font-weight:700; color:#475467; display:flex; align-items:center; gap:6px; }
+.test-log-header .tl-title::before { content:''; width:3px; height:12px; background:#C8102E; border-radius:2px; }
+.test-log-header .tl-clear { background:none; border:none; font-size:11px; color:#999; cursor:pointer; padding:2px 4px; }
+.test-log-header .tl-clear:hover { color:#E60012; }
+.test-log-body { max-height:180px; overflow-y:auto; padding:6px 12px; font-family:Consolas, 'SF Mono', 'Microsoft YaHei', monospace; font-size:12px; line-height:1.7; }
+.test-log-body:empty::before { content:'暂无日志'; color:#bbb; font-family:inherit; }
+.log-entry { display:flex; gap:8px; padding:2px 0; color:#1f2937; }
+.log-time { color:#667085; flex-shrink:0; white-space:nowrap; }
+.log-msg { flex:1; word-break:break-all; }
+.log-entry.info .log-msg { color:#1f2937; }
+.log-entry.success .log-msg { color:#00A73C; }
+.log-entry.warn .log-msg { color:#F08300; }
+.log-entry.error .log-msg { color:#E60012; }
+.log-dur { color:#003366; font-weight:700; flex-shrink:0; }
+.drawer-overlay { background:rgba(0,0,0,.28); backdrop-filter:none; }
+.drawer-container { width:820px; max-width:72vw; background:#fff; box-shadow:-4px 0 16px rgba(0,0,0,.18); }
+.drawer-header { height:58px; padding:0 18px; }
+.drawer-header h3 { font-size:16px; font-weight:700; }
+.drawer-body { background:#fafafa; padding:18px; }
+.drawer-publish-btn { border-radius:16px; padding:7px 14px; }
+.tab-nav { background:#fff; border:1px solid #e5e7eb; border-radius:14px; padding:6px; gap:6px; margin-bottom:14px; }
+.tab-btn { border-radius:12px; border:0 !important; margin:0; padding:8px 14px; }
+.tab-btn.active { background:#FFE8E6; color:#E60012; font-weight:700; }
+.model-summary { border:1px solid #e5e7eb; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+.resource-item, .dep-list, .dep-item { border-radius:12px; }
+.resource-item { background:#fff; border:1px solid #e5e7eb; }
+.action-btn-sm { border-radius:14px; padding:5px 9px; background:#fff; }
+.codebox, .jsonbox, .logbox { background:#f7f8fa; color:#1f2937; border:1px solid #e5e7eb; border-radius:12px; padding:14px 16px; font-family:Consolas, 'SF Mono', 'Microsoft YaHei', monospace; font-size:12px; line-height:1.7; white-space:pre-wrap; overflow:auto; }
+.logbox { background:#111827; color:#d1fae5; }
+.highlight-drawer { margin-top:12px; border:1px solid #e5e7eb; border-left:4px solid #E60012; border-radius:12px; background:#fff; overflow:hidden; }
+.highlight-drawer-header { min-height:44px; padding:0 14px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eef2f7; font-weight:700; color:#003366; }
+.highlight-drawer-body { padding:14px; }
+.highlight-close { border:0; background:none; cursor:pointer; color:#999; font-size:20px; }
+.info-row { padding:8px 0; }
+.info-label { color:#667085; }
+.info-value { color:#1F2A3A; }
+@media (max-width: 900px) { .drawer-container { max-width:96vw; width:96vw; } .stats-row,.resource-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
+
+/* Single-page drawer detail optimization: no secondary tab clicks */
+.drawer-body { padding:16px 18px 22px; }
+.detail-single-page { display:flex; flex-direction:column; gap:14px; }
+.detail-hero { background:#fff; border:1px solid #e5e7eb; border-radius:14px; padding:18px 20px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+.hero-main { display:flex; flex-direction:column; gap:14px; }
+.hero-title { font-size:18px; font-weight:800; color:#003366; display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.hero-desc { margin-top:8px; color:#667085; font-size:13px; line-height:1.7; }
+.hero-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+.hero-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.hero-metric { background:#f8fafc; border:1px solid #eef2f7; border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; justify-content:center; }
+.hero-metric .k { color:#667085; font-size:11px; margin-bottom:4px; }
+.hero-metric .v { color:#003366; font-size:18px; font-weight:800; white-space:nowrap; }
+.detail-section { background:#fff; border:1px solid #e5e7eb; border-radius:14px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+.detail-section-title { display:flex; align-items:center; gap:8px; color:#003366; font-weight:800; margin-bottom:12px; }
+.detail-section-title::before { content:''; width:3px; height:16px; background:#E60012; border-radius:2px; }
+.detail-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.detail-grid-3 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.soft-box { background:#f8fafc; border:1px solid #eef2f7; border-radius:12px; padding:12px; line-height:1.7; font-size:13px; }
+.soft-box .label { color:#667085; font-size:12px; margin-bottom:4px; }
+.soft-box .value { color:#1F2A3A; font-weight:700; }
+.notice-box { background:#fff7e6; border-left:4px solid #fa8c16; border-radius:10px; padding:11px 13px; color:#5c3b00; font-size:13px; line-height:1.7; }
+.compact-table th,.compact-table td { height:auto; padding:8px 10px; }
+.inline-command { background:#f7f8fa; border:1px solid #e5e7eb; border-radius:10px; padding:9px 11px; font-family:Consolas, 'SF Mono', monospace; font-size:12px; overflow:auto; }
+.param-type-cell{cursor:pointer;white-space:nowrap;font-weight:700}
+.param-type-cell:hover{text-decoration:underline}
+.param-type-cell.type-mid{color:#b54708}
+.param-type-cell.type-input{color:#027a48}
+.param-type-cell.type-fit{color:#C8102E}
+.param-type-cell.type-const{color:#1d4ed8}
+.param-value-text{font-family:Consolas,monospace;font-size:12px;color:#1f2937}
+.param-value-input{width:100%;border:1px solid #d1d5db;border-radius:4px;padding:4px 6px;font-size:12px;font-family:inherit;color:#1f2937;background:#fff;outline:none}
+.param-value-input:focus{border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.12)}
+.param-range-cell{color:#6b7280;background:#f9fafb;font-size:12px;text-align:center}
+.param-classify-table{width:100%;border-collapse:collapse;font-size:13px}
+.param-classify-table th{background:#f8fafc;color:#475467;font-weight:600;font-size:12px;padding:8px 10px;text-align:left;border-bottom:2px solid #e5e7eb;white-space:nowrap}
+.param-classify-table td{padding:6px 10px;border-bottom:1px solid #eef2f7;vertical-align:middle}
+.param-classify-table tbody tr:hover{background:#f8fafc}
+.param-classify-table .param-value-cell{padding:3px!important}
+.param-classify-table .param-range-cell{padding:4px 8px!important;color:#6b7280;background:#f9fafb;font-size:12px;text-align:center;cursor:not-allowed;user-select:none}
+@media (max-width: 1200px) { .hero-main { flex-direction:column; } .hero-metrics { width:100%; min-width:0; } }
+@media (max-width: 900px) { .hero-metrics,.detail-grid-2,.detail-grid-3 { grid-template-columns:1fr; } }
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+.md-render{font-size:14px;line-height:1.8;color:#1F2A3A}
+.md-render h1{font-size:20px;font-weight:700;border-bottom:2px solid #C8102E;padding-bottom:8px;margin:0 0 16px}
+.md-render h2{font-size:17px;font-weight:700;border-bottom:1px solid #e0e0e0;padding-bottom:6px;margin:24px 0 12px;color:#003366}
+.md-render h3{font-size:15px;font-weight:600;margin:16px 0 8px;color:#333}
+.md-render h4{font-size:14px;font-weight:600;margin:12px 0 6px;color:#555}
+.md-render p{margin:0 0 10px}
+.md-render ul,.md-render ol{margin:0 0 10px;padding-left:24px}
+.md-render li{margin-bottom:4px}
+.md-render table{width:100%;border-collapse:collapse;margin:0 0 12px;font-size:13px}
+.md-render th,.md-render td{border:1px solid #d0d7de;padding:6px 10px;text-align:left}
+.md-render th{background:#f6f8fa;font-weight:600;white-space:nowrap}
+.md-render td{vertical-align:top}
+.md-render code{background:#f0f0f0;padding:1px 5px;border-radius:3px;font-family:Consolas,monospace;font-size:13px;color:#C8102E}
+.md-render pre{background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:12px 16px;overflow-x:auto;margin:0 0 12px}
+.md-render pre code{background:none;padding:0;color:#1F2A3A}
+.md-render blockquote{border-left:4px solid #C8102E;padding:8px 16px;margin:0 0 12px;background:#fff8f0;color:#555}
+.md-render hr{border:none;border-top:1px solid #e0e0e0;margin:16px 0}
+.md-render img{max-width:100%;border-radius:4px;margin:8px 0}
+.md-render strong{color:#003366}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-bar-left brand">
+    <span class="logo-dot">石</span><span>模型工厂 · 机理模型车间</span>
+  </div>
+  <div class="top-bar-right">
+    <button class="top-bar-btn" title="通知"><span class="btn-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span><span class="dot"></span></button>
+    <button class="top-bar-btn" title="帮助"><span class="btn-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span></button>
+    <div class="top-bar-user">
+      <div class="top-bar-avatar">张</div>
+      <span style="font-size:13px;color:#333;">张工</span>
+    </div>
+  </div>
+</div>
+
+<div class="body-wrap">
+<aside class="sidebar">
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-title">机理模型车间</div>
+      <a class="nav-item active" href="02-机理模型清单.html"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="13" y2="17"/></svg></span> 机理模型清单</a>
+      <a class="nav-item" href="09-机理模型开发.html"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="14" y2="14"/></svg></span> 机理模型开发</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">运行审计</div>
+      <a class="nav-item" href="05-运行审计.html"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span> 运行审计</a>
+    </div>
+  </nav>
+</aside>
+
+<div class="main">
+<div class="content">
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+    <div>
+      <h2 style="margin:0;">机理模型清单</h2>
+      <p style="margin:4px 0 0;">管理所有机理模型的开发状态与生命周期</p>
+    </div>
+    <div>
+      <button class="btn" onclick="location.href='09-机理模型开发.html'"><span class="btn-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>新建机理模型</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px;padding:12px 20px;">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <span style="font-size:13px;color:#666;">筛选：</span>
+      <select class="form-select" style="width:150px;"><option>全部状态</option><option>已发布</option><option>编辑中</option><option>发布中</option><option>审批拒绝</option></select>
+      <select class="form-select" style="width:200px;">
+        <option>全部领域</option>
+        <option>分子级机理</option>
+        <option>反应动力学与反应工程</option>  
+        <option>热力学与物性</option>
+        <option>传递过程</option>
+        <option> 流程模拟与系统集成</option>
+      </select>
+      <input class="form-input" placeholder="搜索模型名称..." style="margin-left:auto;" />
+      <button class="btn btn-secondary" style="padding:6px 12px;">重置</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">模型列表</div>
+    <div class="table-wrap">
+      <table id="model-table">
+        <thead><tr><th>模型开发任务</th><th>模型名称</th><th>领域</th><th>状态</th><th>所属机构</th><th>创建人</th><th>更新时间</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr data-model="FCC集总动力学模型"><td><span class="tag tag-green">HDS参数辨识</span></td><td style="font-weight:500;color:#003366;">FCC集总动力学模型</td><td>反应工程</td><td><span class="tag tag-green">已发布</span></td><td>石化盈科</td><td>张三</td><td>2026-05-19</td><td><a class="op-link detail-link" data-model="FCC集总动力学模型" href="javascript:;">详情</a></td></tr>
+          <tr data-model="常减压塔板效率模型"><td><span class="tag tag-blue">塔板效率建模</span></td><td style="font-weight:500;color:#003366;">常减压塔板效率模型</td><td>分离工程</td><td><span class="tag tag-blue">发布中</span></td><td>石化盈科</td><td>张三</td><td>2026-05-19</td><td><a class="op-link detail-link" data-model="常减压塔板效率模型" href="javascript:;">详情</a></td></tr>
+          <tr data-model="催化裂化动力学模型"><td><span class="tag tag-red">催化裂化辨识</span></td><td style="font-weight:500;color:#003366;">催化裂化动力学模型</td><td>反应工程</td><td><span class="tag tag-red">审批拒绝</span></td><td>镇海炼化</td><td>李四</td><td>2026-05-19</td><td><a class="op-link detail-link" data-model="催化裂化动力学模型" href="javascript:;">详情</a></td></tr>
+          <tr data-model="换热器校核模型"><td><span class="tag tag-green">换热器校核</span></td><td style="font-weight:500;color:#003366;">换热器校核模型</td><td>传热传质</td><td><span class="tag tag-green">已发布</span></td><td>燕山石化</td><td>王五</td><td>2026-05-18</td><td><a class="op-link detail-link" data-model="换热器校核模型" href="javascript:;">详情</a></td></tr>
+          <tr data-model="加氢裂化动力学模型"><td><span class="tag tag-green">加氢裂化建模</span></td><td style="font-weight:500;color:#003366;">加氢裂化动力学模型</td><td>反应工程</td><td><span class="tag tag-green">已发布</span></td><td>石化盈科</td><td>张三</td><td>2026-05-17</td><td><a class="op-link detail-link" data-model="加氢裂化动力学模型" href="javascript:;">详情</a></td></tr>
+          <tr data-model="压缩机热力学模型"><td><span class="tag tag-green">压缩机热力建模</span></td><td style="font-weight:500;color:#003366;">压缩机热力学模型</td><td>热力学</td><td><span class="tag tag-green">已发布</span></td><td>茂名石化</td><td>李四</td><td>2026-05-16</td><td><a class="op-link detail-link" data-model="压缩机热力学模型" href="javascript:;">详情</a></td></tr>
+          <tr data-model="管道压降计算模型"><td><span class="tag tag-purple">管道压降建模</span></td><td style="font-weight:500;color:#003366;">管道压降计算模型</td><td>流体力学</td><td><span class="tag tag-purple">编辑中</span></td><td>上海石化</td><td>王五</td><td>2026-05-20</td><td><a class="op-link detail-link" data-model="管道压降计算模型" href="javascript:;">详情</a></td></tr>
+          <tr data-model="吸收塔传质模型"><td><span class="tag tag-purple">吸收塔传质建模</span></td><td style="font-weight:500;color:#003366;">吸收塔传质模型</td><td>传热传质</td><td><span class="tag tag-purple">编辑中</span></td><td>扬子石化</td><td>赵六</td><td>2026-05-20</td><td><a class="op-link detail-link" data-model="吸收塔传质模型" href="javascript:;">详情</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- 换页栏 -->
+    <div class="pagination">
+      <div class="pg-info">共 <b>86</b> 条记录，当前第 <b>1</b> / <b>9</b> 页</div>
+      <div class="pg-controls">
+        <button class="pg-btn" id="pgPrev" title="上一页">&lt;</button>
+        <button class="pg-btn pg-num active">1</button>
+        <button class="pg-btn pg-num">2</button>
+        <button class="pg-btn pg-num">3</button>
+        <button class="pg-btn pg-num">4</button>
+        <button class="pg-btn pg-num">5</button>
+        <span class="pg-ellipsis">…</span>
+        <button class="pg-btn pg-num">9</button>
+        <button class="pg-btn" id="pgNext" title="下一页">&gt;</button>
+        <select class="pg-size">
+          <option value="10" selected>10条/页</option>
+          <option value="20">20条/页</option>
+          <option value="50">50条/页</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- 右侧抽屉 -->
+<div class="drawer-overlay" id="detailDrawer">
+  <div class="drawer-container">
+    <div class="drawer-header">
+      <h3>模型详情 <span style="font-size:13px; color:#999;">| 参数 · 环境 · 模型信息</span></h3>
+      <div class="drawer-header-actions">
+        <button class="drawer-close" id="closeDrawerBtn">&times;</button>
+      </div>
+    </div>
+    <div class="drawer-body" id="drawerBody">
+      <div style="text-align:center; padding:40px;">加载中...</div>
+    </div>
+  </div>
+</div>
+
+<!-- 服务连通性测试弹窗 -->
+<div class="test-modal-overlay" id="testModalOverlay">
+  <div class="test-modal">
+    <div class="test-modal-header">
+      <div class="tm-title">服务连通性测试</div>
+      <span class="test-modal-model" id="testModalModel"></span>
+      <button class="test-modal-close" onclick="closeTestModal()">&times;</button>
+    </div>
+    <div class="test-modal-body">
+      <div class="test-step" id="testStep1">
+        <div class="step-index">1</div>
+        <div class="step-main">
+          <div class="step-title">机理服务连接确认</div>
+          <div class="step-desc">验证机理模型服务接口连通性，确认服务运行正常</div>
+          <div class="step-status"><span class="status-dot pending"></span><span class="status-text">待测试</span></div>
+        </div>
+      </div>
+      <div class="test-step locked" id="testStep2">
+        <div class="step-index">2</div>
+        <div class="step-main">
+          <div class="step-title">AI网关连接确认</div>
+          <div class="step-desc">验证AI网关路由转发与鉴权链路，确认调用通道可用</div>
+          <div class="step-status"><span class="status-dot pending"></span><span class="status-text">待上一步完成</span></div>
+        </div>
+      </div>
+      <div class="test-result-bar success" id="testResultBarOk">✓ 测试通过：机理服务与AI网关均连接正常</div>
+      <div class="test-result-bar error" id="testResultBarFail" style="display:none;">✗ 测试未通过，请查看日志排查</div>
+      <div class="test-log">
+        <div class="test-log-header">
+          <div class="tl-title">耗时统计日志</div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <label class="tm-fault-toggle"><input type="checkbox" id="tmFaultToggle"> 模拟故障</label>
+            <button class="tl-clear" onclick="clearTestLog()">清空</button>
+          </div>
+        </div>
+        <div class="test-log-body" id="testLogBody"></div>
+      </div>
+    </div>
+    <div class="test-modal-footer">
+      <button class="btn btn-secondary" onclick="closeTestModal()">取消</button>
+      <button class="btn" id="testRetryBtn" style="display:none;" onclick="runTestFlow()">重新测试</button>
+      <button class="btn" id="testFinishBtn" style="display:none;" onclick="closeTestModal()">完成</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 定义所有模型的详细扩展数据
+const modelsDetailMap = {
+  "FCC集总动力学模型": {
+    version: "v2.1", domain: "反应工程", author: "张三", r2: 0.983, desc: "FCC提升管反应器十集总动力学模型，基于Python/SciPy数值求解。模型将原料油和产物划分为十个集总组分，计算汽油、柴油、液化气收率。",
+    inParams: [{name:"T",type:"float",range:"480-550",unit:"℃",desc:"反应温度"},{name:"cat_oil_ratio",type:"float",range:"5-8",unit:"—",desc:"剂油比"}],
+    outParams: [{name:"gasoline_yield",type:"float",desc:"汽油收率(%)"},{name:"diesel_yield",type:"float",desc:"柴油收率(%)"}],
+    k0:"1.2×10¹²", Ea:"125,000", tags:["反应工程","催化裂化","动力学"],适用说明:"基于FCC装置典型工况，建议480-550℃反应温度、5-8剂油比范围内使用。"
+  },
+  "常减压塔板效率模型": {
+    version: "v1.0", domain: "分离工程", author: "张三", r2: 0.912, desc: "基于AIChE模型的常减压蒸馏塔塔板效率预测模型，综合考虑气液传质系数。",
+    inParams: [{name:"pressure",type:"float",range:"0.1-0.5",unit:"MPa"},{name:"viscosity",type:"float",range:"0.2-1.5",unit:"cP"}],
+    outParams: [{name:"efficiency",type:"float",desc:"默弗里板效率"},{name:"HETP",type:"float",desc:"等板高度"}],
+    k0:"—", Ea:"—", tags:["分离工程","塔板效率"],适用说明:"适用于常减压蒸馏轻烃分离段。"
+  },
+  "催化裂化动力学模型": { version: "v3.0", domain: "反应工程", author: "李四", r2: 0.945, desc: "五集总催化裂化动力学模型，包含重油、柴油、汽油、气体、焦炭。", inParams: [{name:"temp",type:"float",range:"490-530",unit:"℃"}], outParams: [{name:"conversion",type:"float",desc:"转化率"}], tags:["催化裂化"],适用说明:"适用于工业FCC装置。" },
+  "换热器校核模型": { version: "v1.2", domain: "传热传质", author: "王五", r2: 0.976, desc: "管壳式换热器校核计算，ε-NTU法，可计算换热面积余量。", inParams: [{name:"flow_hot",type:"float",unit:"kg/h"}], outParams: [{name:"heat_duty",type:"float"},{name:"overall_coeff",type:"float"}], tags:["传热","换热器"],适用说明:"适用于管壳式换热器设计校核。" },
+  "精馏塔严格计算模型": { version: "v1.0", domain: "分离工程", author: "赵六", r2: 0.963, desc: "基于MESH方程的精馏塔严格算法，支持多组分分离。", inParams: [{name:"reflux_ratio",type:"float"}], outParams: [{name:"distillate_composition",type:"array"}], tags:["精馏","严格计算"],适用说明:"适用于多组分精馏模拟。" },
+  "加氢裂化动力学模型": { version: "v2.5", domain: "反应工程", author: "张三", r2: 0.991, desc: "加氢裂化反应网络动力学模型，预测石脑油、航煤、柴油收率。", inParams: [{name:"hydrogen_pressure",type:"float",unit:"MPa"}], outParams: [{name:"naphtha_yield",type:"float"}], tags:["加氢裂化","动力学"],适用说明:"高压加氢装置。" },
+  "压缩机热力学模型": { version: "v2.0", domain: "热力学", author: "李四", r2: 0.954, desc: "离心压缩机性能预测模型，SRK状态方程。", inParams: [{name:"inlet_temp",type:"float"}], outParams: [{name:"discharge_temp",type:"float"},{name:"power",type:"float"}], tags:["压缩机","热力学"],适用说明:"适用于多级离心压缩。" },
+  "管道压降计算模型": { version: "v0.8", domain: "流体力学", author: "王五", r2: 0.921, desc: "单相/两相管道压降计算，包括摩擦损失和局部阻力。", inParams: [{name:"flow_rate",type:"float"},{name:"diameter",type:"float"}], outParams: [{name:"pressure_drop",type:"float"}], tags:["流体","压降"],适用说明:"适用于油气水管道。" },
+  "吸收塔传质模型": { version: "v0.5", domain: "传热传质", author: "赵六", r2: 0.889, desc: "填料吸收塔传质模型，双膜理论。", inParams: [{name:"liquid_rate",type:"float"}], outParams: [{name:"absorption_efficiency",type:"float"}], tags:["吸收","传质"],适用说明:"适用于酸性气体吸收。" }
+};
+
+function getModelDetail(modelName) {
+  return modelsDetailMap[modelName] || {
+    version: "v1.0", domain: "通用领域", author: "系统", r2: 0.85, desc: "暂无详细说明，请完善模型元数据。",
+    inParams: [{name:"参数1",type:"float",range:"0-100",unit:"—"}], outParams: [{name:"输出1",type:"float",desc:"结果"}],
+    tags:["机理模型"],适用说明:"通用模型，需结合实际数据验证。"
+  };
+}
+
+let currentDisplayModelName = "FCC集总动力学模型";
+
+function renderDrawerContent(modelName, versionRaw, domain, status, creator) {
+  currentDisplayModelName = modelName;
+  const detail = getModelDetail(modelName);
+  const r2 = detail.r2;
+  const r2Class = r2 >= 0.9 ? "#00A73C" : "#F08300";
+  const versionText = detail.version || versionRaw || '—';
+  const domainText = detail.domain || domain || '—';
+  const updateTime = '2026-05-19';
+  const tagHtml = (detail.tags || []).map(t => `<span class="tag tag-blue">${t}</span>`).join('');
+
+  const pythonDeps = [
+    { name: "numpy", version: ">=1.26.0", desc: "数值计算基础库" },
+    { name: "scipy", version: ">=1.12.0", desc: "科学计算与ODE求解器 (solve_ivp)" },
+    { name: "pandas", version: ">=2.1.0", desc: "数据处理与输入输出" },
+    { name: "matplotlib", version: ">=3.8.0", desc: "可视化与结果绘图" },
+    { name: "sympy", version: ">=1.12", desc: "符号计算与方程推导(可选)" }
+  ];
+  const depHtml = pythonDeps.map(dep => `<div class="dep-item"><div class="dep-name">${dep.name}</div><div class="dep-version">${dep.version}</div><div class="dep-desc">${dep.desc}</div></div>`).join('');
+
+  const tab1 = `
+    <div class="detail-section">
+      <div class="md-render" id="md-render-area"></div>
+    </div>
+  `;
+
+  const paramsHtml = `
+    <table class="param-classify-table">
+      <thead><tr><th>类型</th><th>参数</th><th>符号</th><th>值</th><th>单位</th><th>范围</th></tr></thead>
+      <tbody>
+        <tr><td class="param-type-cell type-mid">固定参数</td><td>催化剂床层体积</td><td>V<sub>cat</sub></td><td class="param-value-cell"><span class="param-value-text">50.0</span></td><td>m³</td><td class="param-range-cell">—</td></tr>
+        <tr><td class="param-type-cell type-mid">固定参数</td><td>床层孔隙率</td><td>ε</td><td class="param-value-cell"><span class="param-value-text">0.35</span></td><td>无量纲</td><td class="param-range-cell">—</td></tr>
+        <tr><td class="param-type-cell type-mid">固定参数</td><td>气体常数</td><td>R</td><td class="param-value-cell"><span class="param-value-text">8.314</span></td><td>J/(mol·K)</td><td class="param-range-cell">—</td></tr>
+        <tr><td class="param-type-cell type-mid">固定参数</td><td>硫原子摩尔质量</td><td>MW<sub>S</sub></td><td class="param-value-cell"><span class="param-value-text">32.06</span></td><td>g/mol</td><td class="param-range-cell">—</td></tr>
+        <tr><td class="param-type-cell type-mid">固定参数</td><td>柴油平均分子量</td><td>MW<sub>diesel</sub></td><td class="param-value-cell"><span class="param-value-text">220.0</span></td><td>g/mol</td><td class="param-range-cell">—</td></tr>
+        <tr><td class="param-type-cell type-mid">固定参数</td><td>柴油密度</td><td>ρ<sub>L</sub></td><td class="param-value-cell"><span class="param-value-text">850.0</span></td><td>kg/m³</td><td class="param-range-cell">—</td></tr>
+        <tr><td class="param-type-cell type-input">可调变量</td><td>进料硫含量</td><td>C<sub>S0</sub></td><td class="param-value-cell"><span class="param-value-text">—</span></td><td>wppm</td><td class="param-range-cell">5000~20000</td></tr>
+        <tr><td class="param-type-cell type-input">可调变量</td><td>反应温度</td><td>T</td><td class="param-value-cell"><span class="param-value-text">—</span></td><td>K (300~400°C)</td><td class="param-range-cell">573~673</td></tr>
+        <tr><td class="param-type-cell type-input">可调变量</td><td>操作压力</td><td>P</td><td class="param-value-cell"><span class="param-value-text">—</span></td><td>MPa</td><td class="param-range-cell">3.0~8.0</td></tr>
+        <tr><td class="param-type-cell type-input">可调变量</td><td>液时空速</td><td>LHSV</td><td class="param-value-cell"><span class="param-value-text">—</span></td><td>h⁻¹</td><td class="param-range-cell">0.5~3.0</td></tr>
+        <tr><td class="param-type-cell type-fit">拟合参数</td><td><b>指前因子</b></td><td><b>k₀</b></td><td class="param-value-cell"><span class="param-value-text">—</span></td><td>h⁻¹</td><td class="param-range-cell">10⁴~10⁸</td></tr>
+        <tr><td class="param-type-cell type-fit">拟合参数</td><td><b>活化能</b></td><td><b>E<sub>a</sub></b></td><td class="param-value-cell"><span class="param-value-text">—</span></td><td>kJ/mol</td><td class="param-range-cell">80~130</td></tr>
+        <tr><td class="param-type-cell type-fit">拟合参数</td><td><b>压力指数</b></td><td><b>n</b></td><td class="param-value-cell"><span class="param-value-text">—</span></td><td>无量纲</td><td class="param-range-cell">—</td></tr>
+      </tbody>
+    </table>
+  `;
+
+  const tab2 = `
+    <div class="detail-section">
+      <div class="detail-section-title">参数分类</div>
+      <div class="param-classify-table-wrap">${paramsHtml}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">运行环境配置</div>
+      <div class="resource-grid">
+        <div class="resource-item"><div class="rv" style="color:#00A0E9;">Python 3.10+</div><div class="rl">运行环境</div><div class="rs">推荐3.10~3.12</div></div>
+        <div class="resource-item"><div class="rv" style="color:#00A73C;">4 vCPU</div><div class="rl">推荐CPU</div><div class="rs">最低2核</div></div>
+        <div class="resource-item"><div class="rv" style="color:#F08300;">8 GB</div><div class="rl">推荐内存</div><div class="rs">最低4GB</div></div>
+        <div class="resource-item"><div class="rv">无需GPU</div><div class="rl">GPU需求</div><div class="rs">纯CPU计算</div></div>
+      </div>
+      <div class="detail-grid-2" style="margin-top:12px;">
+        <div class="soft-box"><div class="label">存储建议</div><div class="value">系统盘 20GB；数据盘 50GB（用于结果存储）</div></div>
+        <div class="soft-box"><div class="label">启动预估</div><div class="value">冷启动约 30s；热启动 &lt;200ms</div></div>
+        <div class="soft-box"><div class="label">基础镜像</div><div class="value">python:3.10-slim</div></div>
+        <div class="soft-box"><div class="label">健康检查</div><div class="value">HTTP /health 端点</div></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Python依赖库清单</div>
+      <div class="dep-list">${depHtml}</div>
+      <div class="inline-command" style="margin-top:12px;">pip install numpy scipy pandas matplotlib sympy</div>
+    </div>
+  `;
+
+  // ===== 外部调用 tab：MCP 服务调用样例 =====
+  const mcpEndpoint = `https://ai-gateway.sinopec.com/mcp/v1/tools/call`;
+  const mcpSampleRequest = {
+    jsonrpc: "2.0",
+    id: "req-001",
+    method: "tools/call",
+    params: {
+      name: "hds_model_run",
+      arguments: {
+        model_id: "HDS-FixedBed-001",
+        version: detail.version || "v1.2.0",
+        inputs: {
+          feed_sulfur_content: 8500,
+          reaction_temp_K: 623.15,
+          pressure_MPa: 5.0,
+          LHSV: 1.5,
+          catalyst_volume_m3: 50.0,
+          bed_porosity: 0.35
+        },
+        options: {
+          solver: "RK45",
+          tolerance: 1e-6,
+          max_iterations: 1000,
+          return_profile: true
+        }
+      }
+    }
+  };
+  const mcpSampleResponse = {
+    jsonrpc: "2.0",
+    id: "req-001",
+    result: {
+      content: [
+        {
+          type: "text",
+          text: "HDS 模型计算完成",
+          data: {
+            outlet_sulfur_content: 312.5,
+            conversion: 96.32,
+            catalyst_life_days: 428,
+            bed_temperature_profile: [
+              { z_m: 0.0, T_K: 623.15 },
+              { z_m: 5.0, T_K: 625.40 },
+              { z_m: 10.0, T_K: 626.80 },
+              { z_m: 25.0, T_K: 624.10 },
+              { z_m: 50.0, T_K: 621.95 }
+            ]
+          }
+        }
+      ],
+      is_error: false,
+      meta: {
+        model: "HDS-FixedBed-001",
+        version: "v1.2.0",
+        compute_ms: 238,
+        service: "mechanism-model-mcp-server"
+      }
+    }
+  };
+  const jsonReq = JSON.stringify(mcpSampleRequest, null, 2);
+  const jsonRes = JSON.stringify(mcpSampleResponse, null, 2);
+  const modelNameSnake = modelName.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '_');
+
+  const tab3 = `
+    <div class="detail-section">
+      <div class="detail-section-title">MCP 服务调用说明</div>
+      <div class="mcp-intro">当前模型已注册为 MCP（Model Context Protocol）工具，外部系统（AI应用、智能体、第三方平台）可通过 MCP 协议调用。调用端点与鉴权信息如下：</div>
+      <div class="detail-grid-2">
+        <div class="soft-box"><div class="label">MCP 端点</div><div class="value mcp-code">${mcpEndpoint}</div></div>
+        <div class="soft-box"><div class="label">工具名称</div><div class="value mcp-code">${modelNameSnake.toLowerCase()}_run</div></div>
+        <div class="soft-box"><div class="label">鉴权方式</div><div class="value">Bearer Token（AI网关颁发）</div></div>
+        <div class="soft-box"><div class="label">协议规范</div><div class="value">JSON-RPC 2.0 / MCP v1.0</div></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">调用样例 — 请求</div>
+      <div class="code-block-wrap">
+        <div class="code-block-header">
+          <span class="code-lang-badge">JSON · Request</span>
+          <button class="code-copy-btn" onclick="copyJsonSample(this)">复制</button>
+        </div>
+        <pre class="code-block"><code>${jsonReq}</code></pre>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">调用样例 — 响应</div>
+      <div class="code-block-wrap">
+        <div class="code-block-header">
+          <span class="code-lang-badge">JSON · Response</span>
+          <button class="code-copy-btn" onclick="copyJsonSample(this)">复制</button>
+        </div>
+        <pre class="code-block"><code>${jsonRes}</code></pre>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">调用流程说明</div>
+      <div class="mcp-steps">
+        <div class="mcp-step"><div class="mcp-step-num">1</div><div class="mcp-step-body"><b>获取凭证</b>：向 AI 网关申请 Bearer Token，绑定可调用的模型范围</div></div>
+        <div class="mcp-step"><div class="mcp-step-num">2</div><div class="mcp-step-body"><b>发起调用</b>：按上方 JSON-RPC 格式 POST 至 MCP 端点，inputs 字段为模型可调变量</div></div>
+        <div class="mcp-step"><div class="mcp-step-num">3</div><div class="mcp-step-body"><b>解析结果</b>：响应 result.content[0].data 中包含模型输出；compute_ms 为计算耗时</div></div>
+        <div class="mcp-step"><div class="mcp-step-num">4</div><div class="mcp-step-body"><b>异常处理</b>：is_error 为 true 时查看 error 字段；超时建议 30s，可重试 2 次</div></div>
+      </div>
+    </div>
+  `;
+
+  const html = `
+    <div class="detail-single-page">
+      <div class="detail-hero">
+        <div class="hero-main">
+          <div>
+            <div class="hero-title">${modelName}<span class="tag tag-red">机理模型</span><span class="tag tag-blue">${versionText}</span></div>
+            <div class="hero-desc">${detail.desc}</div>
+            <div class="hero-tags">${tagHtml || '<span class="tag tag-gray">机理模型</span>'}</div>
+          </div>
+          <div class="hero-metrics">
+            <div class="hero-metric"><div class="k">状态</div><div class="v">${status || '—'}</div></div>
+            <div class="hero-metric"><div class="k">R²拟合</div><div class="v" style="color:${r2Class};">${r2}</div></div>
+            <div class="hero-metric"><div class="k">语法检查</div><div class="v" style="color:#00A73C;">通过</div></div>
+            <div class="hero-metric"><div class="k">更新时间</div><div class="v">${updateTime}</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-nav" id="detailTabNav">
+        <button class="tab-btn active" onclick="switchDetailTab(this,'tab-info')">模型信息</button>
+        <button class="tab-btn" onclick="switchDetailTab(this,'tab-run')">模型参数</button>
+        <button class="tab-btn" onclick="switchDetailTab(this,'tab-api')">外部调用</button>
+      </div>
+      <div class="tab-panel active" id="tab-info">${tab1}</div>
+      <div class="tab-panel" id="tab-run">${tab2}</div>
+      <div class="tab-panel" id="tab-api">${tab3}</div>
+    </div>
+  `;
+  document.getElementById('drawerBody').innerHTML = html;
+  // 渲染 validation_report.md
+  const mdArea = document.getElementById('md-render-area');
+  if (mdArea && typeof marked !== 'undefined') {
+    mdArea.innerHTML = marked.parse(VALIDATION_REPORT_MD);
+  }
+}
+
+const VALIDATION_REPORT_MD = `# 固定床一级加氢脱硫动力学模型 — 说明文档
+
+## 1. 模型概述
+
+### 1.1 反应体系
+
+| 项目 | 内容 |
+|------|------|
+| 反应方程式 | C₆H₆ + 3H₂ → C₆H₁₂ |
+| 反应类型 | 催化加氢, 放热反应 |
+| 催化剂 | Ni/Al₂O₃ |
+| 反应热 ΔHr | -205 kJ/mol (25°C标准值) |
+| 化学计量比 | 苯:氢气 = 1:3 (摩尔) |
+
+### 1.2 反应器
+
+| 项目 | 内容 |
+|------|------|
+| 类型 | 气相连续搅拌釜式反应器 (CSTR) |
+| 规模 | 中试装置 |
+| 有效体积 | 0.20 m³ |
+| 操作温度 | 100~200°C (373~473 K) |
+| 操作压力 | 1.0~3.0 MPa |
+
+### 1.3 动力学假设
+
+- **拟一级反应**: 对苯一级, 对氢零级 (氢气过量条件下成立)
+- 氢油摩尔比 ≥ 3.5:1, 远超化学计量比 3:1, 保证氢气浓度近似恒定
+- 忽略逆向反应 (热力学平衡常数极大, 逆反应可忽略)
+
+---
+
+## 2. 模型方程
+
+### 2.1 核心方程: 物料衡算
+
+CSTR稳态物料衡算 (对苯组分):
+
+\\\`\\\`\\\`
+X_B = k(T) · τ / (1 + k(T) · τ)
+\\\`\\\`\\\`
+
+其中:
+- \\\`X_B\\\` — 苯转化率 (无量纲, 0~1)
+- \\\`k(T)\\\` — 反应速率常数 [1/s]
+- \\\`τ\\\` — 平均停留时间 [s]
+
+### 2.2 Arrhenius速率常数
+
+\\\`\\\`\\\`
+k(T) = k₀ · exp(-Eₐ / (R·T))
+\\\`\\\`\\\`
+
+其中:
+- \\\`k₀\\\` — 指前因子 [1/s] (**待拟合参数**)
+- \\\`Eₐ\\\` — 活化能 [J/mol] (**待拟合参数**)
+- \\\`R\\\` — 气体常数 = 8.314 J/(mol·K)
+- \\\`T\\\` — 反应温度 [K] (可控操作参数, 实测值)
+
+### 2.3 停留时间与体积流量
+
+\\\`\\\`\\\`
+τ = V / v₀
+v₀ = F₀ · R · T / P    (理想气体状态方程)
+\\\`\\\`\\\`
+
+其中:
+- \\\`V\\\` — 反应器有效体积 [m³]
+- \\\`v₀\\\` — 进料体积流量 [m³/s]
+- \\\`F₀\\\` — 总进料摩尔流量 [mol/s] = FB0 + FH0
+- \\\`P\\\` — 操作压力 [Pa]
+
+### 2.4 辅助方程: 能量衡算 (冷却负荷估算)
+
+\\\`\\\`\\\`
+Q_cool = FB0 · X_B · (-ΔHr) - F₀ · Cp_mix · (T - T_in)
+\\\`\\\`\\\`
+
+其中:
+- \\\`Q_cool\\\` — 冷却移热 [W] (正值表示需要冷却)
+- \\\`FB0\\\` — 苯进料摩尔流量 [mol/s]
+- \\\`Cp_mix\\\` — 混合气平均比热 [J/(mol·K)]
+- \\\`T_in\\\` — 进料温度 [K], 假设 T_in = T - 15 K
+
+> **注意**: 能量衡算仅用于辅助计算冷却负荷, 不参与动力学参数标定.
+
+---
+
+## 3. 参数分类
+
+### 3.1 固定参数 (parameters.json)
+
+运行中不可修改的参数, 基于文献值或物理常数:
+
+| 参数 | 符号 | 值 | 单位 | 来源 |
+|------|------|-----|------|------|
+| 反应器体积 | V | 0.20 | m³ | 中试装置设计参数 |
+| 反应热 | ΔHr | -205000 | J/mol | NIST标准文献值 |
+| 气体常数 | R | 8.314 | J/(mol·K) | 物理常数 |
+| 苯分子量 | MW_benzene | 78.11 | g/mol | 标准物性数据 |
+| 氢气分子量 | MW_H2 | 2.016 | g/mol | 标准物性数据 |
+| 环己烷分子量 | MW_cyclohexane | 84.16 | g/mol | 标准物性数据 |
+| 混合气比热 | Cp_mix | 45.0 | J/(mol·K) | 估算值 |
+| 进料温度偏移 | T_in_offset | 15.0 | K | 工程假设 |
+
+### 3.2 可调变量 (variables.json)
+
+运行前可修改的配置项:
+
+| 类别 | 参数 | 说明 |
+|------|------|------|
+| **数据生成** | random_seed | 随机种子, 保证数据可复现 |
+| | n_data | 生成数据组数 (默认20) |
+| | noise_level_X | 转化率测量噪声标准差 (默认0.008) |
+| **操作范围** | T_reactor_K | 反应温度范围 373~473 K (100~200°C) |
+| | P_Pa | 操作压力范围 1.0~3.0 MPa |
+| | FB0_kmol_h | 苯进料流量范围 5~30 kmol/h |
+| | H2_benzene_ratio | 氢油摩尔比范围 3.5~6.0 |
+| **拟合配置** | initial_guess | 初始猜测值 k₀=5e5, Eₐ=40000 |
+| | bounds | 搜索范围 k₀∈[1e3,1e15], Eₐ∈[20000,150000] |
+| | residual_sigma_X | 残差归一化因子 σ=0.01 |
+| | method | 优化算法 trf (Trust Region Reflective) |
+| **生产数据** | production_data | 20组实测数据 (进料+操作+观测) |
+| **预测工况** | prediction_cases | 9组待预测工况 |
+
+### 3.3 待拟合参数
+
+| 参数 | 符号 | 物理含义 | 真实值(参考) | 拟合结果 |
+|------|------|----------|-------------|----------|
+| 指前因子 | k₀ | Arrhenius指前因子 | 8.0×10⁶ 1/s | ~5.1×10⁶ 1/s |
+| 活化能 | Eₐ | Arrhenius活化能 | 50.0 kJ/mol | ~48.6 kJ/mol |
+
+---
+
+## 4. 文件结构
+
+\\\`\\\`\\\`
+model.py        ← 计算代码 (Python)
+parameters.json    ← 固定参数 (文献值/物理常数)
+variables.json ← 可调变量 (操作范围/拟合配置/生产数据/预测工况)
+validation_report.md      ← 说明文档 (本文件)
+benzene_hydrogenation_data.json      ← 运行输出 (拟合结果+预测结果, 自动生成)
+fig1_obs_vs_pred.png                 ← 图1: 观测值 vs 拟合值散点图 (自动生成)
+fig2_residuals.png                   ← 图2: 残差分析图 (自动生成)
+fig3_arrhenius.png                   ← 图3: Arrhenius图 (自动生成)
+fig4_predictions.png                 ← 图4: 预测工况对比图 (自动生成)
+\\\`\\\`\\\`
+
+### 4.1 各文件职责
+
+| 文件 | 职责 | 修改频率 |
+|------|------|----------|
+| \\\`*_cstr.py\\\` | 核心计算逻辑: 模型方程、拟合算法、数据生成、结果输出 | 极少修改 |
+| \\\`*_params.json\\\` | 固定参数: 物理常数、物性数据、反应器设计参数 | 极少修改 |
+| \\\`*_variables.json\\\` | 可调变量: 生产数据、拟合配置、预测工况 | 每次运行前可修改 |
+| \\\`*_data.json\\\` | 运行输出: 拟合参数、拟合质量、预测结果 | 每次运行自动覆盖 |
+
+---
+
+## 5. 使用方法
+
+### 5.1 环境要求
+
+\\\`\\\`\\\`bash
+pip install numpy scipy matplotlib
+\\\`\\\`\\\`
+
+### 5.2 运行模型
+
+\\\`\\\`\\\`bash
+# 使用现有生产数据进行拟合
+python model.py
+
+# 重新生成模拟生产数据后再拟合
+python model.py --generate
+\\\`\\\`\\\`
+
+\\\`--generate\\\` 参数会用真实动力学参数 + CSTR正向模型重新生成20组模拟生产数据,
+并写入 \\\`variables.json\\\`. 这确保了温度以 Kelvin 精确存储,
+避免 °C↔K 往返转换的精度损失.
+
+### 5.3 修改生产数据
+
+编辑 \\\`variables.json\\\` 中的 \\\`production_data\\\` 数组, 每组数据格式:
+
+\\\`\\\`\\\`json
+{
+  "id": 1,
+  "feed": {
+    "FB0_kmol_h": 23.3,
+    "H2_benzene_ratio": 5.0
+  },
+  "operating": {
+    "T_reactor_K": 410.55,
+    "P_MPa": 2.93
+  },
+  "observed": {
+    "X_B": 0.941
+  }
+}
+\\\`\\\`\\\`
+
+> **重要**: 温度字段使用 \\\`T_reactor_K\\\` (开尔文), 避免摄氏度→开尔文转换的精度损失.
+> 代码同时兼容旧格式 \\\`T_reactor_C\\\` (摄氏度), 但推荐使用 Kelvin.
+
+### 5.4 修改预测工况
+
+编辑 \\\`variables.json\\\` 中的 \\\`prediction_cases\\\` 数组:
+
+\\\`\\\`\\\`json
+{
+  "desc": "基准工况(150°C)",
+  "T_reactor_K": 423.15,
+  "FB0_kmol_h": 15.0,
+  "H2_benzene_ratio": 4.5,
+  "P_MPa": 2.0
+}
+\\\`\\\`\\\`
+
+### 5.5 调整拟合配置
+
+编辑 \\\`variables.json\\\` 中的 \\\`fitting_config\\\`:
+- \\\`initial_guess\\\`: 初始猜测值 (影响收敛速度, 不影响最终结果)
+- \\\`bounds\\\`: 参数搜索范围 (防止拟合到非物理解)
+- \\\`residual_sigma_X\\\`: 残差归一化因子 (影响拟合权重)
+
+---
+
+## 6. 方法论说明
+
+### 6.1 为什么反应温度是操作参数而非求解变量?
+
+工业苯加氢反应器均配备精密温控系统 (夹套冷却/加热), 反应温度 T 可直接测量和控制.
+因此动力学参数标定仅需物料衡算, 无需联立能量衡算——这是化学反应工程中动力学参数
+回归的标准方法.
+
+参考文献:
+- Fogler, H.S., "Elements of Chemical Reaction Engineering", 6th Ed., Pearson, 2020
+- Levenspiel, O., "Chemical Reaction Engineering", 3rd Ed., Wiley, 1999
+
+### 6.2 为什么采用气相中试CSTR而非工业液相CSTR?
+
+工业液相苯加氢CSTR转化率通常 > 99%, 此时转化率几乎不随温度变化, 动力学参数
+(k₀, Eₐ) 不可辨识. 气相中试CSTR停留时间短 (1~30 s), 转化率在 0.30~0.99 之间
+变化, 使 Arrhenius 参数可由生产数据有效回归.
+
+### 6.3 k₀ 误差较大的原因
+
+Arrhenius 参数 k₀ 与 Eₐ 存在强相关性 (补偿效应): k₀ 增大同时 Eₐ 增大, 可在
+一定温度范围内产生相近的 k(T) 值. 因此 k₀ 的拟合误差通常远大于 Eₐ, 这是
+Arrhenius 参数估计中的典型现象. 关键评价指标是:
+1. 活化能 Eₐ 的准确度 (误差 < 5%)
+2. 模型预测精度 (R² > 0.98)
+3. 预测转化率与实测值的偏差
+
+### 6.4 为什么温度使用 Kelvin 而非摄氏度?
+
+Arrhenius 方程中温度 T 以开尔文 (K) 为单位直接参与指数运算. 如果数据以 °C 存储,
+每次计算都需要 +273.15 转换, 这个过程会引入浮点精度损失, 尤其是在指数函数中
+误差会被放大. 使用 Kelvin 存储可以:
+1. 消除 °C↔K 往返转换的精度损失
+2. 确保生成数据与拟合数据的一致性
+3. 避免 \\\`T_reactor_C: 137.4\\\` → \\\`410.55 K\\\` → \\\`137.40°C\\\` 的非对称舍入
+
+---
+
+## 7. 拟合结果参考
+
+| 指标 | 值 |
+|------|-----|
+| 拟合 k₀ | ~5.1×10⁶ 1/s (真实值 8.0×10⁶, 误差 ~36%) |
+| 拟合 Eₐ | ~48.6 kJ/mol (真实值 50.0, 误差 ~2.9%) |
+| 转化率 R² | 0.992 |
+| 转化率 RMSE | 0.0052 |
+
+---
+
+## 8. 可视化图表
+
+运行模型后自动生成4张分析图表, 保存为PNG图片.
+
+### 8.1 观测值 vs 拟合值散点图
+
+![观测值 vs 拟合值](fig1_obs_vs_pred.png)
+
+- 数据点越靠近对角虚线, 表示拟合越好
+- 标题中显示 R2 和 RMSE 指标
+- 每个数据点标注序号, 便于定位异常点
+
+### 8.2 残差分析图
+
+![残差分析](fig2_residuals.png)
+
+- **左图**: 残差 vs 温度, 理想情况下残差应随机分布在零线附近, 无明显趋势
+- **右图**: 残差直方图, 应近似正态分布且以0为中心
+- 若残差呈现系统性趋势 (如随温度增大), 说明模型可能存在缺陷
+
+### 8.3 Arrhenius图
+
+![Arrhenius图](fig3_arrhenius.png)
+
+- 横轴为 1000/T [1/K], 纵轴为 ln(k)
+- 蓝色实线: 真实参数对应的 Arrhenius 线
+- 红色虚线: 拟合参数对应的 Arrhenius 线
+- 散点: 各数据点温度下拟合参数计算的 k 值
+- 两条线斜率接近说明活化能拟合准确, 截距差异反映 k₀ 的补偿效应
+
+### 8.4 预测工况对比图
+
+![预测工况对比](fig4_predictions.png)
+
+- **上图**: 9种工况的预测转化率柱状图, 柱顶标注具体数值
+- **下图**: 对应工况的停留时间 τ (蓝) 和速率常数 k (红) 双轴对比
+- 可直观比较温度、进料量、压力等操作条件对转化率的影响
+`;
+function switchDetailTab(btn, panelId) {
+  document.querySelectorAll('#detailTabNav .tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#drawerBody .tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+function showArtifactPanel(title, bodyHtml) {
+  const panel = document.getElementById('artifactPanel');
+  if (!panel) return;
+  panel.style.display = 'block';
+  panel.innerHTML = `
+    <div class="highlight-drawer-header">
+      <span>${title}</span>
+      <button class="highlight-close" onclick="document.getElementById('artifactPanel').style.display='none'">&times;</button>
+    </div>
+    <div class="highlight-drawer-body">${bodyHtml}</div>
+  `;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function openDrawer(modelName, versionRaw, domain, status, creator) {
+  renderDrawerContent(modelName, versionRaw, domain, status, creator);
+  document.getElementById('detailDrawer').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('detailDrawer').classList.remove('open');
+}
+
+document.querySelectorAll('.detail-link').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const tr = link.closest('tr');
+    const modelName = tr.getAttribute('data-model') || tr.cells[1]?.innerText;
+    const taskName = tr.cells[0]?.querySelector('.tag')?.innerText || '';
+    const domain = tr.cells[2]?.innerText;
+    const statusElem = tr.cells[3]?.querySelector('.tag');
+    const status = statusElem ? statusElem.innerText : tr.cells[3]?.innerText;
+    const creator = tr.cells[5]?.innerText;
+    openDrawer(modelName, '', domain, status, creator);
+  });
+});
+document.getElementById('closeDrawerBtn').addEventListener('click', closeDrawer);
+document.querySelector('.drawer-overlay').addEventListener('click', (e) => { if(e.target.classList.contains('drawer-overlay')) closeDrawer(); });
+
+/* 操作列按钮：编辑 / 发布 / 测试 — 复用详情页相同逻辑 */
+function handleModelEdit(modelName) {
+  location.href = '09-机理模型开发.html';
+}
+function handleModelPublish(modelName) {
+  if (!modelName) { alert('请先选择一个模型'); return; }
+  alert(`模型“${modelName}”已提交发布，等待审核。`);
+}
+function handleModelDisable(modelName) {
+  if (!modelName) { alert('请先选择一个模型'); return; }
+  const ok = confirm(`确定停用模型“${modelName}”吗？\n停用后该模型服务将下线，调用方将无法访问。`);
+  if (ok) alert(`模型“${modelName}”已停用。`);
+}
+function handleModelTest(modelName) {
+  openTestModal(modelName);
+}
+
+// 为模型列表操作列注入按钮：编辑 / 发布 / 测试
+document.querySelectorAll('#model-table tbody tr').forEach(tr => {
+  const statusEl = tr.querySelector('td:nth-child(4) .tag');
+  const status = statusEl ? statusEl.innerText.trim() : '';
+  const modelName = tr.getAttribute('data-model') || tr.cells[1]?.innerText || '';
+  const opsCell = tr.querySelector('td:last-child');
+
+  // 编辑按钮：所有状态可用
+  const editBtn = document.createElement('a');
+  editBtn.className = 'op-link op-edit';
+  editBtn.href = 'javascript:;';
+  editBtn.textContent = '编辑';
+  editBtn.addEventListener('click', (e) => { e.preventDefault(); handleModelEdit(modelName); });
+  opsCell.appendChild(editBtn);
+
+  // 发布/停用按钮：已发布状态显示“停用”，其余状态显示“发布”
+  const actionBtn = document.createElement('a');
+  actionBtn.href = 'javascript:;';
+  if (status === '已发布') {
+    actionBtn.className = 'op-link op-disable';
+    actionBtn.textContent = '停用';
+    actionBtn.title = '停用后模型服务下线，调用方将无法访问';
+    actionBtn.addEventListener('click', (e) => { e.preventDefault(); handleModelDisable(modelName); });
+  } else {
+    actionBtn.className = 'op-link op-publish';
+    actionBtn.textContent = '发布';
+    actionBtn.addEventListener('click', (e) => { e.preventDefault(); handleModelPublish(modelName); });
+  }
+  opsCell.appendChild(actionBtn);
+
+  // 测试按钮：仅“已发布”状态可点
+  const testBtn = document.createElement('a');
+  testBtn.className = 'op-link op-test';
+  testBtn.textContent = '测试';
+  if (status === '已发布' && modelName) {
+    testBtn.href = 'javascript:;';
+    testBtn.addEventListener('click', (e) => { e.preventDefault(); handleModelTest(modelName); });
+  } else {
+    testBtn.classList.add('disabled');
+    testBtn.title = '仅“已发布”状态的模型支持连通性测试';
+  }
+  opsCell.appendChild(testBtn);
+});
+
+/* ===== 服务连通性测试 ===== */
+// 错误样本池：用于模拟各类连接故障，含错误类型/码/描述/排查建议
+const TEST_ERROR_POOL = {
+  step1: [
+    { type:'ConnectionError', code:'ECONNREFUSED', msg:'机理服务端口 8081 拒绝连接', detail:'目标服务未启动或防火墙拦截', suggest:'检查机理服务进程是否运行，端口 8081 是否开放' },
+    { type:'TimeoutError', code:'ETIMEDOUT', msg:'连接机理服务超时（5s 内无响应）', detail:'网络延迟过高或服务负载饱和', suggest:'检查网络链路、服务CPU/内存占用' },
+    { type:'HTTPError', code:'HTTP 502', msg:'机理服务返回 502 Bad Gateway', detail:'反向代理上游服务异常退出', suggest:'查看机理服务日志，确认上游进程存活' },
+    { type:'AuthError', code:'AUTH_FAIL', msg:'机理服务鉴权失败：Token 无效', detail:'服务端密钥已轮换，本地缓存过期', suggest:'重新获取访问令牌后重试' }
+  ],
+  step2: [
+    { type:'ConnectionError', code:'ECONNREFUSED', msg:'AI网关端口 9090 拒绝连接', detail:'网关服务未部署或未启动', suggest:'确认 AI 网关部署状态与端口配置' },
+    { type:'TimeoutError', code:'ETIMEDOUT', msg:'AI网关健康检查超时（3s 内无响应）', detail:'网关内部路由表加载缓慢', suggest:'查看网关启动日志，确认路由加载完成' },
+    { type:'HTTPError', code:'HTTP 503', msg:'AI网关返回 503 Service Unavailable', detail:'网关限流熔断触发', suggest:'确认上游服务状态，必要时调大限流阈值' },
+    { type:'AuthError', code:'AUTH_FAIL', msg:'AI网关鉴权失败：API Key 已过期', detail:'网关侧 API Key 有效期 30 天，已超期', suggest:'在网关控制台轮换 API Key' }
+  ]
+};
+
+const testModalState = { model: '', step1: 'pending', step2: 'locked', running: false, timers: [], failAt: 0 };
+
+function openTestModal(modelName) {
+  testModalState.model = modelName;
+  document.getElementById('testModalModel').textContent = modelName;
+  document.getElementById('testModalOverlay').classList.add('open');
+  runTestFlow();
+}
+
+function closeTestModal() {
+  testModalState.running = false;
+  testModalState.timers.forEach(clearTimeout);
+  testModalState.timers = [];
+  document.getElementById('testModalOverlay').classList.remove('open');
+}
+
+function fmtTime(d) {
+  const p = n => String(n).padStart(2, '0');
+  return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}.${String(d.getMilliseconds()).padStart(3,'0')}`;
+}
+
+function logTest(level, msg, durMs) {
+  const body = document.getElementById('testLogBody');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry ' + level;
+  const timeHtml = `<span class="log-time">[${fmtTime(new Date())}]</span>`;
+  const durHtml = durMs != null ? `<span class="log-dur">${durMs}ms</span>` : '';
+  entry.innerHTML = `${timeHtml}<span class="log-msg">${msg}</span>${durHtml}`;
+  body.appendChild(entry);
+  body.scrollTop = body.scrollHeight;
+}
+
+// 打印结构化错误详情
+function logTestError(err, durMs) {
+  logTest('error', `✗ [${err.type}] ${err.msg}`, durMs);
+  logTest('warn', `  └ 错误码：${err.code}`);
+  logTest('warn', `  └ 原因：${err.detail}`);
+  logTest('info', `  └ 建议：${err.suggest}`);
+}
+
+function clearTestLog() {
+  document.getElementById('testLogBody').innerHTML = '';
+}
+
+function pickError(stepKey) {
+  const pool = TEST_ERROR_POOL[stepKey];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function runTestFlow() {
+  testModalState.step1 = 'testing';
+  testModalState.step2 = 'locked';
+  testModalState.running = true;
+  testModalState.timers.forEach(clearTimeout);
+  testModalState.timers = [];
+  renderTestModal();
+  // 勾选「模拟故障」时，随机选一个失败步骤（1或2），否则全部成功
+  const simulateFault = document.getElementById('tmFaultToggle').checked;
+  testModalState.failAt = simulateFault ? (Math.random() < 0.5 ? 1 : 2) : 0;
+  logTest('info', `开始测试「${testModalState.model}」${simulateFault ? '（已开启故障模拟，将触发第' + testModalState.failAt + '步失败）' : ''}`);
+  // 第一步：机理服务连接
+  const t1Start = performance.now();
+  logTest('info', '→ 步骤1 机理服务：发起连接检测...');
+  testModalState.timers.push(setTimeout(() => {
+    if (!testModalState.running) return;
+    const dur1 = Math.round(performance.now() - t1Start);
+    if (testModalState.failAt === 1) {
+      // 模拟失败
+      const err = pickError('step1');
+      testModalState.step1 = 'failed';
+      renderTestModal();
+      logTestError(err, dur1);
+      showResult(false);
+      logTest('error', `测试未通过：步骤1 失败，已中止后续测试`);
+      return;
+    }
+    testModalState.step1 = 'done';
+    testModalState.step2 = 'testing';
+    renderTestModal();
+    logTest('success', '✓ 步骤1 机理服务连接正常', dur1);
+    // 第二步：AI网关连接
+    const t2Start = performance.now();
+    logTest('info', '→ 步骤2 AI网关：发起连接检测...');
+    testModalState.timers.push(setTimeout(() => {
+      if (!testModalState.running) return;
+      const dur2 = Math.round(performance.now() - t2Start);
+      if (testModalState.failAt === 2) {
+        const err = pickError('step2');
+        testModalState.step2 = 'failed';
+        renderTestModal();
+        logTestError(err, dur2);
+        showResult(false);
+        logTest('error', `测试未通过：步骤2 失败`);
+        return;
+      }
+      testModalState.step2 = 'done';
+      renderTestModal();
+      logTest('success', '✓ 步骤2 AI网关连接正常', dur2);
+      const total = Math.round(dur1 + dur2);
+      logTest('info', `测试完成，总耗时 ${total}ms`);
+      showResult(true);
+    }, 900));
+  }, 900));
+}
+
+function showResult(ok) {
+  document.getElementById('testResultBarOk').classList.toggle('show', ok);
+  document.getElementById('testResultBarFail').classList.toggle('show', !ok);
+  document.getElementById('testResultBarOk').style.display = ok ? 'flex' : 'none';
+  document.getElementById('testResultBarFail').style.display = ok ? 'none' : 'flex';
+  // 完成或失败都可重新测试
+  document.getElementById('testRetryBtn').style.display = '';
+  document.getElementById('testFinishBtn').style.display = ok ? '' : 'none';
+}
+
+function renderTestModal() {
+  [1, 2].forEach(n => {
+    const box = document.getElementById('testStep' + n);
+    const state = testModalState['step' + n];
+    const dot = box.querySelector('.status-dot');
+    const text = box.querySelector('.status-text');
+    const idx = box.querySelector('.step-index');
+    box.classList.toggle('locked', state === 'locked');
+    box.classList.toggle('doing', state === 'testing');
+    box.classList.toggle('done', state === 'done');
+    box.classList.toggle('failed', state === 'failed');
+    idx.textContent = state === 'done' ? '✓' : (state === 'failed' ? '✗' : String(n));
+    if (state === 'locked') {
+      dot.className = 'status-dot pending'; text.textContent = '待上一步完成';
+    } else if (state === 'pending') {
+      dot.className = 'status-dot pending'; text.textContent = '待测试';
+    } else if (state === 'testing') {
+      dot.className = 'status-dot testing'; text.textContent = '连接检测中…';
+    } else if (state === 'failed') {
+      dot.className = 'status-dot failed'; text.textContent = '连接失败';
+    } else {
+      dot.className = 'status-dot success'; text.textContent = '连接正常';
+    }
+  });
+  const allDone = testModalState.step1 === 'done' && testModalState.step2 === 'done';
+  const anyFailed = testModalState.step1 === 'failed' || testModalState.step2 === 'failed';
+  if (allDone) showResult(true);
+  else if (anyFailed) showResult(false);
+  else {
+    document.getElementById('testResultBarOk').classList.remove('show');
+    document.getElementById('testResultBarFail').classList.remove('show');
+    document.getElementById('testResultBarOk').style.display = 'none';
+    document.getElementById('testResultBarFail').style.display = 'none';
+    document.getElementById('testRetryBtn').style.display = 'none';
+    document.getElementById('testFinishBtn').style.display = 'none';
+  }
+}
+
+document.getElementById('testModalOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'testModalOverlay') closeTestModal();
+});
+
+/* ===== 换页栏交互 ===== */
+const pgState = { total: 86, page: 1, pageSize: 10 };
+
+/* ===== MCP 调用样例复制 ===== */
+function copyJsonSample(btn) {
+  const code = btn.closest('.code-block-wrap').querySelector('code').innerText;
+  const done = () => { btn.textContent = '已复制'; setTimeout(() => { btn.textContent = '复制'; }, 1600); };
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(code).then(done).catch(() => fallbackCopy(code, done));
+  } else {
+    fallbackCopy(code, done);
+  }
+}
+function fallbackCopy(text, done) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); done(); } catch (e) { alert('复制失败，请手动选择复制'); }
+  document.body.removeChild(ta);
+}
+const totalPages = () => Math.ceil(pgState.total / pgState.pageSize);
+
+function renderPagination() {
+  const total = totalPages();
+  const cur = pgState.page;
+  const pgInfo = document.querySelector('.pg-info');
+  pgInfo.innerHTML = `共 <b>${pgState.total}</b> 条记录，当前第 <b>${cur}</b> / <b>${total}</b> 页`;
+  const controls = document.querySelector('.pg-controls');
+  // 重建页码按钮：1 … (cur-2..cur+2) … total
+  const nums = new Set([1, total]);
+  for (let i = cur - 2; i <= cur + 2; i++) if (i >= 1 && i <= total) nums.add(i);
+  const list = [...nums].sort((a, b) => a - b);
+  let html = `<button class="pg-btn" id="pgPrev" title="上一页" ${cur === 1 ? 'disabled' : ''}>&lt;</button>`;
+  list.forEach((n, idx) => {
+    if (idx > 0 && n - list[idx - 1] > 1) html += `<span class="pg-ellipsis">…</span>`;
+    html += `<button class="pg-btn pg-num ${n === cur ? 'active' : ''}" data-page="${n}">${n}</button>`;
+  });
+  html += `<button class="pg-btn" id="pgNext" title="下一页" ${cur === total ? 'disabled' : ''}>&gt;</button>`;
+  html += `<select class="pg-size">${[10, 20, 50].map(s => `<option value="${s}" ${s === pgState.pageSize ? 'selected' : ''}>${s}条/页</option>`).join('')}</select>`;
+  controls.innerHTML = html;
+  // 绑定事件
+  controls.querySelector('#pgPrev')?.addEventListener('click', () => gotoPage(cur - 1));
+  controls.querySelector('#pgNext')?.addEventListener('click', () => gotoPage(cur + 1));
+  controls.querySelectorAll('.pg-num').forEach(btn => {
+    btn.addEventListener('click', () => gotoPage(parseInt(btn.dataset.page, 10)));
+  });
+  controls.querySelector('.pg-size').addEventListener('change', (e) => {
+    pgState.pageSize = parseInt(e.target.value, 10);
+    gotoPage(1);
+  });
+}
+
+function gotoPage(page) {
+  const total = totalPages();
+  if (page < 1 || page > total) return;
+  pgState.page = page;
+  renderPagination();
+  // 演示环境：滚动到列表顶部
+  document.getElementById('model-table').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+renderPagination();
+
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', function(e) { e.preventDefault(); var href = this.getAttribute('href'); if(href && href !== '02-机理模型清单.html') window.location.href = href; });
+});
+
+// 默认不自动打开详情，用户点击“详情”后展示右侧抽屉。
+</script>
+</body>
+</html>
